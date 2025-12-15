@@ -6,6 +6,7 @@ from tkinter import ttk, messagebox, scrolledtext
 import subprocess
 import threading
 import os
+import sys
 
 class FedoraSoftwareInstaller:
     def __init__(self):
@@ -13,17 +14,17 @@ class FedoraSoftwareInstaller:
         self.root.title("Fedora Software Installer")
         self.root.geometry("800x750")
         self.root.resizable(True, True)
-        
+
         # Переменные для языка
         self.language = tk.StringVar(value="ru")
         self.translations = {
             "ru": self.get_russian_text(),
             "en": self.get_english_text()
         }
-        
+
         self.setup_ui()
         self.update_language()
-    
+
     def get_russian_text(self):
         return {
             "title": "Установщик программ для Fedora",
@@ -107,7 +108,7 @@ Super + Shift + Q - принудительно закрыть
 
 В процессе установки может потребоваться ввод пароля."""
         }
-    
+
     def get_english_text(self):
         return {
             "title": "Fedora Software Installer", 
@@ -191,46 +192,46 @@ INSTALLATION PROCESS:
 
 Password may be required during installation."""
         }
-    
+
     def setup_ui(self):
         # Верхняя панель с выбором языка
         top_frame = ttk.Frame(self.root)
         top_frame.pack(fill='x', padx=10, pady=5)
-        
+
         # Кнопка помощи
         self.help_btn = ttk.Button(top_frame, text="?", width=2, command=self.show_help)
         self.help_btn.pack(side='left')
-        
+
         # Выбор языка
         lang_frame = ttk.Frame(top_frame)
         lang_frame.pack(side='right')
-        
+
         ttk.Label(lang_frame, text="Language:").pack(side='left', padx=5)
         ttk.Radiobutton(lang_frame, text="Русский", variable=self.language, 
                        value="ru", command=self.update_language).pack(side='left', padx=5)
         ttk.Radiobutton(lang_frame, text="English", variable=self.language,
                        value="en", command=self.update_language).pack(side='left', padx=5)
-        
+
         # Предупреждающая надпись
         self.warning_label = tk.Label(self.root, text="", font=('Arial', 10), 
                                     fg='red', bg='lightyellow')
         self.warning_label.pack(fill='x', padx=10, pady=5)
-        
+
         # Основной фрейм
         main_frame = ttk.Frame(self.root)
         main_frame.pack(fill='both', expand=True, padx=20, pady=10)
-        
+
         # Заголовок
         self.title_label = ttk.Label(main_frame, text="", font=('Arial', 12, 'bold'))
         self.title_label.pack(pady=(0, 10))
-        
+
         # Фрейм для выбора окружения
         de_frame = ttk.LabelFrame(main_frame, text="")
         de_frame.pack(fill='x', pady=(0, 10))
-        
+
         self.de_label = ttk.Label(de_frame, text="")
         self.de_label.pack(anchor='w', padx=5, pady=5)
-        
+
         # Переменные для окружений
         self.de_vars = {
             "hyprland": tk.BooleanVar(),
@@ -238,169 +239,172 @@ Password may be required during installation."""
             "kde": tk.BooleanVar(),
             "xfce": tk.BooleanVar()
         }
-        
+
         de_inner_frame = ttk.Frame(de_frame)
         de_inner_frame.pack(fill='x', padx=10, pady=5)
-        
+
         # Чекбоксы с описаниями
         ttk.Checkbutton(de_inner_frame, text="Hyprland (Modern Wayland)", 
                        variable=self.de_vars["hyprland"]).pack(anchor='w', padx=5, pady=2)
         ttk.Label(de_inner_frame, text="Много горячих клавиш, для опытных", 
                  font=('Arial', 8), foreground='gray').pack(anchor='w', padx=25)
-        
+
         ttk.Checkbutton(de_inner_frame, text="KDE Plasma (Windows-like)", 
                        variable=self.de_vars["kde"]).pack(anchor='w', padx=5, pady=2)
         ttk.Label(de_inner_frame, text="Похож на Windows, для новичков", 
                  font=('Arial', 8), foreground='gray').pack(anchor='w', padx=25)
-        
+
         ttk.Checkbutton(de_inner_frame, text="GNOME (Modern)", 
                        variable=self.de_vars["gnome"]).pack(anchor='w', padx=5, pady=2)
         ttk.Label(de_inner_frame, text="Минималистичный, похож на MacOS", 
                  font=('Arial', 8), foreground='gray').pack(anchor='w', padx=25)
-        
+
         ttk.Checkbutton(de_inner_frame, text="XFCE (Lightweight)", 
                        variable=self.de_vars["xfce"]).pack(anchor='w', padx=5, pady=2)
         ttk.Label(de_inner_frame, text="Легкий и быстрый, для старых ПК", 
                  font=('Arial', 8), foreground='gray').pack(anchor='w', padx=25)
-        
+
         # Фрейм для списка программ
         list_frame = ttk.Frame(main_frame)
         list_frame.pack(fill='both', expand=True)
-        
+
         # Создаем Treeview для красивого списка
         columns = ('selected', 'name', 'type')
         self.tree = ttk.Treeview(list_frame, columns=columns, show='tree headings', height=18)
-        
+
         # Настраиваем колонки
         self.tree.column('#0', width=0, stretch=False)
         self.tree.column('selected', width=80, anchor='center')
         self.tree.column('name', width=450, anchor='w')
         self.tree.column('type', width=150, anchor='w')
-        
+
         # Заголовки
         self.tree.heading('selected', text='')
         self.tree.heading('name', text='')
         self.tree.heading('type', text='')
-        
+
         # Scrollbar
         scrollbar = ttk.Scrollbar(list_frame, orient='vertical', command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
-        
+
         self.tree.pack(side='left', fill='both', expand=True)
         scrollbar.pack(side='right', fill='y')
-        
+
         # Данные о программах
         self.software_list = [
             # === ОБЯЗАТЕЛЬНЫЕ СИСТЕМНЫЕ ===
-            {"id": "rpmfusion_free", "name": "RPM Fusion Free", "required": True, "type": "repository"},
-            {"id": "rpmfusion_nonfree", "name": "RPM Fusion Non-Free", "required": True, "type": "repository"},
-            {"id": "flatpak", "name": "Flatpak", "required": True, "type": "package"},
-            {"id": "flathub", "name": "Flathub Repository", "required": True, "type": "repository"},
-            
+            {"id": "rpmfusion_free", "name": "RPM Fusion Free", "required": True, "type": "repository", "dnf_cmd": ["dnf", "install", "-y", "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"]},
+            {"id": "rpmfusion_nonfree", "name": "RPM Fusion Non-Free", "required": True, "type": "repository", "dnf_cmd": ["dnf", "install", "-y", "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"]},
+            {"id": "flatpak", "name": "Flatpak", "required": True, "type": "package", "dnf_cmd": ["dnf", "install", "-y", "flatpak"]},
+            {"id": "flathub", "name": "Flathub Repository", "required": True, "type": "repository", "dnf_cmd": ["flatpak", "remote-add", "--if-not-exists", "flathub", "https://flathub.org/repo/flathub.flatpakrepo"]},
+
             # === ДРАЙВЕРА ===
-            {"id": "nvidia_drivers", "name": "NVIDIA Drivers", "required": False, "type": "drivers"},
-            {"id": "media_codecs", "name": "Media Codecs", "required": False, "type": "package"},
-            
+            {"id": "nvidia_drivers", "name": "NVIDIA Drivers", "required": False, "type": "drivers", "dnf_cmd": ["dnf", "install", "-y", "akmod-nvidia", "xorg-x11-drv-nvidia-cuda"]},
+            {"id": "media_codecs", "name": "Media Codecs", "required": False, "type": "package", "dnf_cmd": ["dnf", "groupupdate", "-y", "--with-optional", "Multimedia"]},
+
             # === БРАУЗЕРЫ ===
-            {"id": "firefox", "name": "Firefox", "required": False, "type": "browser"},
-            {"id": "chrome", "name": "Google Chrome", "required": False, "type": "browser"},
-            {"id": "chromium", "name": "Chromium", "required": False, "type": "browser"},
-            {"id": "opera", "name": "Opera", "required": False, "type": "browser"},
-            {"id": "brave", "name": "Brave Browser", "required": False, "type": "browser"},
-            
+            {"id": "firefox", "name": "Firefox", "required": False, "type": "browser", "dnf_cmd": ["dnf", "install", "-y", "firefox"]},
+            {"id": "chrome", "name": "Google Chrome", "required": False, "type": "browser", "dnf_cmd": ["dnf", "config-manager", "--set-enabled", "google-chrome"]},
+            {"id": "chromium", "name": "Chromium", "required": False, "type": "browser", "dnf_cmd": ["dnf", "install", "-y", "chromium"]},
+            {"id": "opera", "name": "Opera", "required": False, "type": "browser", "dnf_cmd": ["dnf", "config-manager", "--set-enabled", "opera"]},
+            {"id": "brave", "name": "Brave Browser", "required": False, "type": "browser", "dnf_cmd": ["dnf", "install", "-y", "brave-browser"]},
+
             # === РАЗРАБОТКА ===
-            {"id": "vscode", "name": "Visual Studio Code", "required": False, "type": "development"},
-            {"id": "git", "name": "Git", "required": False, "type": "development"},
-            {"id": "python", "name": "Python Development", "required": False, "type": "development"},
-            
+            {"id": "vscode", "name": "Visual Studio Code", "required": False, "type": "development", "dnf_cmd": ["rpm", "--import", "https://packages.microsoft.com/keys/microsoft.asc", "&&", "sh", "-c", "echo -e '[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc' > /etc/yum.repos.d/vscode.repo", "&&", "dnf", "install", "-y", "code"]},
+            {"id": "git", "name": "Git", "required": False, "type": "development", "dnf_cmd": ["dnf", "install", "-y", "git"]},
+            {"id": "python", "name": "Python Development", "required": False, "type": "development", "dnf_cmd": ["dnf", "install", "-y", "python3", "python3-devel", "python3-pip"]},
+
             # === МЕССЕНДЖЕРЫ ===
-            {"id": "telegram", "name": "Telegram", "required": False, "type": "messenger"},
-            {"id": "discord", "name": "Discord", "required": False, "type": "messenger"},
-            {"id": "signal", "name": "Signal", "required": False, "type": "messenger"},
-            
+            {"id": "telegram", "name": "Telegram", "required": False, "type": "messenger", "dnf_cmd": ["flatpak", "install", "-y", "flathub", "org.telegram.desktop"]},
+            {"id": "discord", "name": "Discord", "required": False, "type": "messenger", "dnf_cmd": ["flatpak", "install", "-y", "flathub", "com.discordapp.Discord"]},
+            {"id": "signal", "name": "Signal", "required": False, "type": "messenger", "dnf_cmd": ["flatpak", "install", "-y", "flathub", "org.signal.Signal"]},
+
             # === МУЛЬТИМЕДИА ===
-            {"id": "vlc", "name": "VLC Media Player", "required": False, "type": "media"},
-            {"id": "spotify", "name": "Spotify", "required": False, "type": "media"},
-            {"id": "obs", "name": "OBS Studio", "required": False, "type": "media"},
-            {"id": "gimp", "name": "GIMP", "required": False, "type": "graphics"},
-            {"id": "kdenlive", "name": "Kdenlive", "required": False, "type": "media"},
-            
+            {"id": "vlc", "name": "VLC Media Player", "required": False, "type": "media", "dnf_cmd": ["dnf", "install", "-y", "vlc"]},
+            {"id": "spotify", "name": "Spotify", "required": False, "type": "media", "dnf_cmd": ["flatpak", "install", "-y", "flathub", "com.spotify.Client"]},
+            {"id": "obs", "name": "OBS Studio", "required": False, "type": "media", "dnf_cmd": ["dnf", "install", "-y", "obs-studio"]},
+            {"id": "gimp", "name": "GIMP", "required": False, "type": "graphics", "dnf_cmd": ["dnf", "install", "-y", "gimp"]},
+            {"id": "kdenlive", "name": "Kdenlive", "required": False, "type": "media", "dnf_cmd": ["dnf", "install", "-y", "kdenlive"]},
+
             # === ОФИС ===
-            {"id": "libreoffice", "name": "LibreOffice", "required": False, "type": "office"},
-            
+            {"id": "libreoffice", "name": "LibreOffice", "required": False, "type": "office", "dnf_cmd": ["dnf", "install", "-y", "libreoffice"]},
+
             # === СИСТЕМНЫЕ УТИЛИТЫ ===
-            {"id": "wine", "name": "Wine", "required": False, "type": "compatibility"},
-            {"id": "steam", "name": "Steam", "required": False, "type": "games"},
-            {"id": "gparted", "name": "GParted", "required": False, "type": "system"},
-            {"id": "htop", "name": "htop", "required": False, "type": "system"},
-            {"id": "neofetch", "name": "neofetch", "required": False, "type": "system"},
+            {"id": "wine", "name": "Wine", "required": False, "type": "compatibility", "dnf_cmd": ["dnf", "install", "-y", "wine"]},
+            {"id": "steam", "name": "Steam", "required": False, "type": "games", "dnf_cmd": ["dnf", "install", "-y", "steam"]},
+            {"id": "gparted", "name": "GParted", "required": False, "type": "system", "dnf_cmd": ["dnf", "install", "-y", "gparted"]},
+            {"id": "htop", "name": "htop", "required": False, "type": "system", "dnf_cmd": ["dnf", "install", "-y", "htop"]},
+            {"id": "neofetch", "name": "neofetch", "required": False, "type": "system", "dnf_cmd": ["dnf", "install", "-y", "neofetch"]},
         ]
-        
+
         # Заполняем список программ
         self.populate_software_list()
-        
+
         # Привязываем обработчик кликов
         self.tree.bind('<Button-1>', self.on_tree_click)
-        
+
         # Кнопка установки
         self.install_btn = ttk.Button(main_frame, text="", command=self.start_installation)
         self.install_btn.pack(pady=10)
-        
+
         # Прогресс бар
         self.progress = ttk.Progressbar(main_frame, mode='indeterminate')
-        
+
         # Текстовое поле для логов
         self.log_text = scrolledtext.ScrolledText(main_frame, height=10, state='disabled')
         self.log_text.pack(fill='both', expand=False, pady=5)
-    
+
     def populate_software_list(self):
         """Заполняем список программ"""
         for item in self.tree.get_children():
             self.tree.delete(item)
-        
+
         for software in self.software_list:
             status = "✓" if software.get('selected', software['required']) else "☐"
             tags = ('required',) if software['required'] else ('optional',)
             
+            if software['required']:
+                software['selected'] = True
+
             item = self.tree.insert('', 'end', values=(
                 status, 
                 software['name'],
                 software['type']
             ), tags=tags)
-            
+
             # Сохраняем ID программы в item
             self.tree.set(item, '#id', software['id'])
-    
+
     def on_tree_click(self, event):
         """Обработчик кликов по дереву"""
         item = self.tree.identify_row(event.y)
         column = self.tree.identify_column(event.x)
-        
+
         if item and column == '#1':  # Колонка с галочкой
             software_id = self.tree.set(item, '#id')
             software = next((s for s in self.software_list if s['id'] == software_id), None)
-            
+
             if software and not software['required']:
                 # Переключаем состояние
-                software['selected'] = not software.get('selected', True)
+                software['selected'] = not software.get('selected', False)
                 status = "✓" if software['selected'] else "☐"
                 self.tree.set(item, 'selected', status)
-    
+
     def update_language(self):
         """Обновляем интерфейс при смене языка"""
         lang = self.language.get()
         texts = self.translations[lang]
-        
+
         self.root.title(texts["title"])
         self.title_label.config(text=texts["select_software"])
         self.install_btn.config(text=texts["install_btn"])
         self.de_label.config(text=texts["select_de"])
         self.warning_label.config(text=texts["warning_text"])
-        
+
         # Обновляем заголовки таблицы
         self.tree.heading('name', text='Program' if lang == 'en' else 'Программа')
         self.tree.heading('type', text='Type' if lang == 'en' else 'Тип')
-        
+
         # Обновляем описания окружений
         for widget in self.root.winfo_children():
             if isinstance(widget, ttk.LabelFrame):
@@ -418,218 +422,17 @@ Password may be required during installation."""
                                     desc_label.config(text="Minimalistic, MacOS-like" if lang == "en" else "Минималистичный, похож на MacOS")
                                 elif "Легкий и быстрый" in current_text:
                                     desc_label.config(text="Lightweight and fast, for old PCs" if lang == "en" else "Легкий и быстрый, для старых ПК")
-    
+
     def show_help(self):
         """Показываем окно помощи"""
         lang = self.language.get()
         texts = self.translations[lang]
-        
+
         help_window = tk.Toplevel(self.root)
         help_window.title(texts["help_title"])
         help_window.geometry("650x550")
         help_window.resizable(False, False)
-        
+
         help_text = scrolledtext.ScrolledText(help_window, wrap=tk.WORD)
         help_text.pack(fill='both', expand=True, padx=10, pady=10)
-        help_text.insert('1.0', texts["help_text"])
-        help_text.config(state='disabled')
-        
-        ttk.Button(help_window, text="OK", command=help_window.destroy).pack(pady=10)
-    
-    def log_message(self, message):
-        """Добавляем сообщение в лог"""
-        self.log_text.config(state='normal')
-        self.log_text.insert(tk.END, message + "\n")
-        self.log_text.see(tk.END)
-        self.log_text.config(state='disabled')
-        self.root.update()
-    
-    def install_software(self):
-        """Основная функция установки"""
-        try:
-            self.progress.pack(fill='x', pady=5)
-            self.progress.start()
-            self.install_btn.config(state='disabled')
-            
-            lang = self.language.get()
-            texts = self.translations[lang]
-            
-            self.log_message(texts["progress"])
-            
-            # Установка окружений
-            if self.de_vars["hyprland"].get():
-                self.log_message("🚀 Installing Hyprland...")
-                self.install_hyprland()
-            
-            if self.de_vars["gnome"].get():
-                self.log_message("🖥️ Installing GNOME...")
-                # subprocess.run(['sudo', 'dnf', 'groupinstall', '-y', 'gnome'])
-            
-            if self.de_vars["kde"].get():
-                self.log_message("🎨 Installing KDE Plasma...")
-                # subprocess.run(['sudo', 'dnf', 'groupinstall', '-y', 'kde-plasma-desktop'])
-            
-            if self.de_vars["xfce"].get():
-                self.log_message("⚡ Installing XFCE...")
-                # subprocess.run(['sudo', 'dnf', 'groupinstall', '-y', 'xfce-desktop'])
-            
-            # Получаем выбранные программы
-            selected_software = [s for s in self.software_list 
-                               if s.get('selected', s['required'])]
-            
-            # Установка выбранных программ
-            for software in selected_software:
-                self.log_message(f"📦 Installing: {software['name']}")
-                # TODO: Добавить реальные команды установки для каждой программы
-                # self.install_package(software)
-            
-            self.log_message("✅ " + texts["complete"])
-            messagebox.showinfo(texts["complete"], texts["complete"])
-            
-        except Exception as e:
-            self.log_message(f"❌ {texts['error']}: {str(e)}")
-            messagebox.showerror(texts["error"], str(e))
-        finally:
-            self.progress.stop()
-            self.progress.pack_forget()
-            self.install_btn.config(state='normal')
-    
-    def install_hyprland(self):
-        """Установка Hyprland через официальный скрипт"""
-        try:
-            self.log_message("📥 Cloning Hyprland repository...")
-            
-            # Выполняем команды установки Hyprland
-            commands = [
-                "git clone --depth=1 https://github.com/JaKooLit/Fedora-Hyprland.git ~/Fedora-Hyprland",
-                "cd ~/Fedora-Hyprland && chmod +x install.sh",
-                "cd ~/Fedora-Hyprland && ./install.sh"
-            ]
-            
-            for i, cmd in enumerate(commands):
-                self.log_message(f"🔧 Executing: {cmd.split('&&')[-1].strip()}")
-                result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-                
-                if result.returncode != 0:
-                    self.log_message(f"⚠️ Command failed: {cmd}")
-                    if i == 2:  # Если упала установка
-                        self.log_message("💡 You may need to run the installer manually from ~/Fedora-Hyprland")
-                else:
-                    if i == 0:
-                        self.log_message("✅ Repository cloned successfully")
-                    elif i == 1:
-                        self.log_message("✅ Permissions set")
-                    elif i == 2:
-                        self.log_message("✅ Hyprland installation started!")
-            
-            self.log_message("🎯 Hyprland hotkeys configured:")
-            self.log_message("   Super+1,2,3... - Switch workspaces")
-            self.log_message("   Super+C - Terminal")
-            self.log_message("   Super+F - Browser") 
-            self.log_message("   Super+V - VS Code")
-            self.log_message("   Super+Q - Close window")
-            self.log_message("💡 IMPORTANT: DO NOT enable ROG option if you don't have ROG laptop!")
-            
-            # Создаем файл с горячими клавишами для пользователя
-            self.create_hyprland_hotkeys_guide()
-            
-        except Exception as e:
-            self.log_message(f"❌ Hyprland installation error: {str(e)}")
-            self.log_message("💡 Try running manually: cd ~/Fedora-Hyprland && ./install.sh")
-    
-    def create_hyprland_hotkeys_guide(self):
-        """Создает файл с горячими клавишами Hyprland"""
-        hotkeys_content = """# Hyprland Hotkeys Guide
-# These keybindings are configured automatically
-
-# Workspace switching
-bind = SUPER, 1, workspace, 1
-bind = SUPER, 2, workspace, 2  
-bind = SUPER, 3, workspace, 3
-bind = SUPER, 4, workspace, 4
-bind = SUPER, 5, workspace, 5
-bind = SUPER, 6, workspace, 6
-
-# Applications
-bind = SUPER, C, exec, kitty
-bind = SUPER, F, exec, firefox
-bind = SUPER, V, exec, code
-bind = SUPER, D, exec, rofi -show drun
-
-# Window management
-bind = SUPER, Q, killactive
-bind = SUPER SHIFT, Q, exit
-bind = SUPER, T, togglefloating
-bind = SUPER, RETURN, exec, kitty
-
-# Move focus
-bind = SUPER, left, movefocus, l
-bind = SUPER, right, movefocus, r
-bind = SUPER, up, movefocus, u
-bind = SUPER, down, movefocus, d
-
-# Fullscreen
-bind = SUPER, F11, fullscreen
-
-# Useful tips:
-# - Super + D: Application launcher
-# - Super + Q: Close active window  
-# - Super + T: Toggle floating mode
-# - Super + 1-6: Switch workspaces"""
-        
-        try:
-            home_dir = os.path.expanduser("~")
-            guide_path = os.path.join(home_dir, "hyprland-hotkeys.txt")
-            with open(guide_path, 'w') as f:
-                f.write(hotkeys_content)
-            self.log_message(f"📝 Hotkeys guide saved to: {guide_path}")
-        except Exception as e:
-            self.log_message(f"⚠️ Could not create hotkeys guide: {e}")
-    
-    def start_installation(self):
-        """Запускаем установку в отдельном потоке"""
-        # Проверяем, что выбрано хотя бы что-то
-        has_de = any(var.get() for var in self.de_vars.values())
-        has_software = any(s.get('selected', s['required']) for s in self.software_list)
-        
-        if not has_de and not has_software:
-            lang = self.language.get()
-            messagebox.showwarning(
-                "Warning" if lang == "en" else "Предупреждение",
-                "No software selected!" if lang == "en" else "Не выбрано ни одной программы!"
-            )
-            return
-        
-        # Предупреждение о времени установки
-        lang = self.language.get()
-        warning_msg = (
-            "Installation may take 1-2 hours. Make sure your laptop is charged!\nContinue?"
-            if lang == "en" else 
-            "Установка может занять 1-2 часа. Убедитесь, что ноутбук заряжен!\nПродолжить?"
-        )
-        
-        if not messagebox.askyesno("Warning" if lang == "en" else "Предупреждение", warning_msg):
-            return
-        
-        thread = threading.Thread(target=self.install_software)
-        thread.daemon = True
-        thread.start()
-    
-    def run(self):
-        """Запускаем приложение"""
-        # Настраиваем стиль для обязательных программ
-        style = ttk.Style()
-        style.configure('required.Treeview', foreground='gray')
-        
-        self.tree.tag_configure('required', style='required.Treeview')
-        
-        self.root.mainloop()
-
-if __name__ == "__main__":
-    # Проверяем, что мы на Fedora
-    if os.path.exists('/etc/fedora-release'):
-        app = FedoraSoftwareInstaller()
-        app.run()
-    else:
-        print("This installer is designed for Fedora Linux only.")
-        print("Этот установщик предназначен только для Fedora Linux.")
+        help_text.insert('1.0',
