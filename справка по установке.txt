@@ -1,127 +1,84 @@
-1.для начала скачайте iso образ https://fedoraproject.org/ru/workstation/download потом откройте руфус
-выберете iso образ вставьте вашу USB накопитель в "файловой системе" 
-выберете FAT32!!! это обязательно учьтите что все даные с накопителя будут уничтожены без возвратно!!
-2.после создания установочной флешки зайдите в Boot Menu ASUS
-F8 или F11 - Boot Menu
+Инструкция по установке Fedora Linux
 
-F2 или DEL - BIOS/UEFI
-
-Esc - Boot Menu (некоторые модели)
-
-Acer
-F12 - Boot Menu
-
-F2 - BIOS/UEFI
-
-Alt + F10 - Recovery
-
-Dell
-F12 - Boot Menu
-
-F2 - BIOS/UEFI
-
-Fn + F12 (на некоторых ноутбуках)
-
-HP
-F9 - Boot Menu
-
-F10 - BIOS/UEFI
-
-Esc → F9 - Boot Menu
-
-Lenovo
-F12 - Boot Menu
-
-F2 - BIOS/UEFI
-
-Fn + F12 (на ноутбуках)
-
-Novo Button ⚡ (специальная кнопка)
-
-MSI
-F11 - Boot Menu
-
-DEL - BIOS/UEFI
-
-Gigabyte
-F12 - Boot Menu
-
-DEL - BIOS/UEFI
-
-ASRock
-F11 - Boot Menu
-
-F2 или DEL - BIOS/UEFI
-
-💻 Ноутбуки:
-Samsung
-Esc - Boot Menu
-
-F2 - BIOS/UEFI
-
-Sony VAIO
-F11 - Boot Menu
-
-F2 - BIOS/UEFI
-
-ASSIST Button (специальная кнопка)
-
-Toshiba
-F12 - Boot Menu
-
-F2 - BIOS/UEFI
-
-Fujitsu
-F12 - Boot Menu
-
-F2 - BIOS/UEFI
-
-Huawei
-F12 - Boot Menu
-
-F2 - BIOS/UEFI
-
-Xiaomi
-F12 - Boot Menu
-
-F2 - BIOS/UEFI
-
-🖥️ Материнские платы:
-Intel
-F10 - Boot Menu
-
-F2 - BIOS/UEFI
-
-ASUS Motherboards
-F8 - Boot Menu
-
-DEL - BIOS/UEFI
-
-Gigabyte Motherboards
-F12 - Boot Menu
-
-DEL - BIOS/UEFI
-
-MSI Motherboards
-F11 - Boot Menu
-
-DEL - BIOS/UEFI
-
-ASRock Motherboards
-F11 - Boot Menu
-
-F2 или DEL - BIOS/UEFI
-
-Biostar
-F9 - Boot Menu
-
-DEL - BIOS/UEFI
-
-EVGA
-F7 - Boot Menu
-
-DEL - BIOS/UEFI
-запуститесь с вашей флешки и приступите к установки 
-3. с помощью накопителя перенисите .py файл на Linux систему запустите и завершите установку
-                 ВАЖНО!!!!!
-прочетайте справку перед установкой!!!!!
+1. Для начала скачайте ISO-образ с официального сайта: https://fedoraproject.org/ru/workstation/download. Затем откройте программу Rufus.
+   · Выберите скачанный ISO-образ.
+   · Вставьте ваш USB-накопитель.
+   · В разделе «Файловая система» обязательно выберите FAT32! Учтите, что все данные с накопителя будут безвозвратно уничтожены!
+2. После создания установочной флешки войдите в Boot Menu (меню выбора загрузки). Клавиши для входа различаются в зависимости от производителя вашего устройства:
+   💻 Ноутбуки и ПК:
+   ASUS
+   · F8 или F11 — Boot Menu
+   · F2 или DEL — BIOS/UEFI
+   · Esc — Boot Menu (некоторые модели)
+   Acer
+   · F12 — Boot Menu
+   · F2 — BIOS/UEFI
+   · Alt + F10 — Recovery
+   Dell
+   · F12 — Boot Menu
+   · F2 — BIOS/UEFI
+   · Fn + F12 (на некоторых ноутбуках)
+   HP
+   · F9 — Boot Menu
+   · F10 — BIOS/UEFI
+   · Esc → F9 — Boot Menu
+   Lenovo
+   · F12 — Boot Menu
+   · F2 — BIOS/UEFI
+   · Fn + F12 (на ноутбуках)
+   · ⚡ Novo Button (специальная кнопка)
+   MSI
+   · F11 — Boot Menu
+   · DEL — BIOS/UEFI
+   Gigabyte
+   · F12 — Boot Menu
+   · DEL — BIOS/UEFI
+   ASRock
+   · F11 — Boot Menu
+   · F2 или DEL — BIOS/UEFI
+   💻 Ноутбуки:
+   Samsung
+   · Esc — Boot Menu
+   · F2 — BIOS/UEFI
+   Sony VAIO
+   · F11 — Boot Menu
+   · F2 — BIOS/UEFI
+   · ASSIST Button (специальная кнопка)
+   Toshiba
+   · F12 — Boot Menu
+   · F2 — BIOS/UEFI
+   Fujitsu
+   · F12 — Boot Menu
+   · F2 — BIOS/UEFI
+   Huawei
+   · F12 — Boot Menu
+   · F2 — BIOS/UEFI
+   Xiaomi
+   · F12 — Boot Menu
+   · F2 — BIOS/UEFI
+   🖥️ Материнские платы:
+   Intel
+   · F10 — Boot Menu
+   · F2 — BIOS/UEFI
+   ASUS
+   · F8 — Boot Menu
+   · DEL — BIOS/UEFI
+   Gigabyte
+   · F12 — Boot Menu
+   · DEL — BIOS/UEFI
+   MSI
+   · F11 — Boot Menu
+   · DEL — BIOS/UEFI
+   ASRock
+   · F11 — Boot Menu
+   · F2 или DEL — BIOS/UEFI
+   Biostar
+   · F9 — Boot Menu
+   · DEL — BIOS/UEFI
+   EVGA
+   · F7 — Boot Menu
+   · DEL — BIOS/UEFI
+   Выберите в меню вашу флешку и запуститесь с неё, чтобы приступить к установке.
+3. С помощью этого же накопителя (или другим способом) перенесите ваш .py файл на установленную Linux-систему, запустите его и завершите настройку.
+   ⚠️ ВАЖНО!
+   Обязательно прочтите справочную информацию перед установкой!
